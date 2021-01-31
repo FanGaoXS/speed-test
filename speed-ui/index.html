@@ -167,6 +167,7 @@
 
       downloadButton(){
         console.log('开始测试下载速度->>>>');
+        this.isError = false;
         this.count = 0;
         this.speedArray = [];
         this.flag = true;
@@ -204,7 +205,7 @@
           let speedBps = (imageSize/diffSeconds)*8; //每秒下载多少B的资源
           let speedKBps = speedBps / 1024;  //每秒下载多少KB（千B）的资源
           let speedMbps = speedKBps / 1024; //每秒下载多少MB（兆B）的资源
-          console.log('下载速度',speedMbps,'Mbps');
+          console.log('['+that.count/10+']'+'下载速率',speedMbps,'Mbps');
           //将该次测速得到的速率追加到速率速组里
           that.speedArray.push(speedMbps);
           delete image; //下载完成后删除该图片资源
@@ -223,6 +224,7 @@
        */
       uploadButton(){
         console.log('开始测试上行速度->>>>');
+        this.isError = false;
         this.count = 0;
         this.speedArray = [];
         this.flag = true;
@@ -279,7 +281,7 @@
             let speedBps = (contentLength*8)/(diffTime/1000);
             let speedKbps = speedBps / 1024 ;
             let speedMbps = speedKbps / 1024 ;
-            console.log('上行速度',speedMbps,'Mbps（仅供参考）');
+            console.log('['+that.count/10+']'+'上行速率',speedMbps,'Mbps（仅供参考）');
             //将该次测速得到的速率追加到速率速组里
             that.speedArray.push(speedMbps);
             if (that.count<that.maxCount){//如果没有到达最大次数，则依然执行
@@ -289,7 +291,8 @@
             }
           },
           error(err){
-            that.isError=true;
+            that.isError = true;
+            that.flag = false;
             console.log(err);
           }
         })
