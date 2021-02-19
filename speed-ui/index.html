@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
-  <!-- 引入样式 -->
+  <!-- cdn引入elementUI的样式 -->
   <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
   <style>
     .el-header, .el-footer {
@@ -99,9 +99,9 @@
 
 <!-- 开发环境版本，包含了有帮助的命令行警告 -->
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<!-- 引入组件库 -->
+<!-- cdn引入elementUI组件库 -->
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-<!--引入jQuery-->
+<!--cdn引入jQuery（需要用到ajax）-->
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.0/jquery.js"></script>
 <script>
   let app=new Vue({
@@ -191,9 +191,9 @@
         let image = new Image(); //定义Image对象
         /*let imageSrc='http://speed.wqkd.blctek.com/test1.jpg';
         let imageSize=2348490;*/
-        let imageSrc='./download/test.JPG';
-        let imageSize=7984555;
-        image.src = imageSrc + '?n=' +Math.random(); //随机访问该图片资源
+        let imageSrc='./download/test.JPG';	//图片路径（绝对或相对或互联网URL资源）
+        let imageSize=7984555;			   //图片大小（单位字节byte）
+        image.src = imageSrc + '?n=' +Math.random(); //给该图片资源对象绑定src（随机添加n访问）
         let startTime = new Date().getTime(); //开始下载时的时间戳
         let that = this;
         image.onload = function () { //图片加载完时会执行的回调函数
@@ -202,9 +202,10 @@
           console.log('endTime',endTime);*/
           // console.log('延迟',endTime-startTime,'ms'); //误差为6ms
           let diffSeconds = (endTime - startTime)/1000; //差时间转为秒
-          let speedBps = (imageSize/diffSeconds)*8; //每秒下载多少B的资源
-          let speedKBps = speedBps / 1024;  //每秒下载多少KB（千B）的资源
-          let speedMbps = speedKBps / 1024; //每秒下载多少MB（兆B）的资源
+          let bps = imageSize/diffSeconds;
+          let speedBps = bps*8; //每秒下载多少B的资源
+          let speedKbps = speedBps / 1024;  //每秒下载多少KB（千B）的资源
+          let speedMbps = speedKbps / 1024; //每秒下载多少MB（兆B）的资源
           console.log('['+that.count/10+']'+'下载速率',speedMbps,'Mbps');
           //将该次测速得到的速率追加到速率速组里
           that.speedArray.push(speedMbps);
@@ -255,33 +256,29 @@
         let startTime = new Date().getTime();
         // console.log('startTime->',startTime);
         let that = this;
-        let text =`
-          测试测试测试测试测试测试测试测试测试测试测试测试测试
-          `;
+        let text = 'A'; //一个字母为1byte
         let totalText ;
-        for (let i = 0; i < 500000; i++) {
-          totalText+=text;
+        for (let i = 0; i < 1024 * 1024 * 2; i++) {
+          totalText+=text; //生成2M大小的资源
         }
         let formData = new FormData();
         formData.append('text',totalText);
         $.ajax({
           url: '//localhost:8080/uploadSpeedTest',
           type: 'POST',
-          timeout: 5000,
+          timeout: 60000,
           processData:false,
           contentType:false,
           data:formData,
           success(res){
-            let endTime = res.data.endTime;
+            let endTime = new Date().getTime();
+            let diffSeconds = (endTime-startTime)/1000;
             let contentLength = res.data.contentLength;
-            let diffTime = endTime-startTime;
-            /*console.log('endTime->',endTime);
-            console.log('contentLength->',contentLength);
-            console.log('diffTime->',diffTime);*/
-            let speedBps = (contentLength*8)/(diffTime/1000);
+            let bps = contentLength/diffSeconds;
+            let speedBps = bps * 8;
             let speedKbps = speedBps / 1024 ;
             let speedMbps = speedKbps / 1024 ;
-            console.log('['+that.count/10+']'+'上行速率',speedMbps,'Mbps（仅供参考）');
+            console.log('['+that.count/20+']'+'上行速率',speedMbps,'Mbps（仅供参考）');
             //将该次测速得到的速率追加到速率速组里
             that.speedArray.push(speedMbps);
             if (that.count<that.maxCount){//如果没有到达最大次数，则依然执行

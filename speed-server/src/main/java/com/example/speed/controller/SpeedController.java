@@ -37,15 +37,19 @@ public class SpeedController {
         log.info("（国家带宽算法）客户端向服务端发送请求的速率->[{}MBps]",(speed * 8) / 1024 / 1024);
         HashMap<String, Object> resMap = new HashMap<>();
         resMap.put("data",speed);*/
+        //该http请求的contentLength（此次请求的资源大小）
         long contentLength = request.getContentLengthLong();
-        long endTime = new Date().getTime();
+        log.info("contentLength->[{} Byte]",contentLength);
+
+        //数据集合
         HashMap<String, Object> dataMap = new HashMap<>();
         dataMap.put("contentLength",contentLength);
-        log.info("contentLength->[{} Byte]",contentLength);
-        dataMap.put("endTime",endTime);
+
+        //res返回体集合
         HashMap<String, Object> resMap = new HashMap<>();
         resMap.put("msg","客户端到服务端请求");
         resMap.put("data",dataMap);
+
         return resMap;
     }
 }
